@@ -1,0 +1,249 @@
+/*package com.estacionamento.controller;
+import com.estacionamento.view.PagamentoView;
+import com.estacionamento.model.PagamentoModel;
+import com.estacionamento.model.Bilhete;
+import com.estacionamento.enums.Meses;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.io.IOException;
+
+public class PagamentoController  {
+  private BilheteController bilheteController;
+  private PagamentoView pagamentoView;
+  private PagamentoModel pagamentoModel;
+   public PagamentoController() throws IOException, ClassNotFoundException {
+    this.pagamentoView = new PagamentoView(this);
+    this.pagamentoModel = new PagamentoModel();
+    this.bilheteController = new BilheteController();
+   }
+
+  public void realizarPagamento(short identificador){
+    Bilhete bilhete = bilheteController.buscarBilhete(identificador);
+    //calcularValorPagamento(bilhete)
+    //pagamentoModel.gerarComprovantePagamento(); //valor pagamento e metodopagamento
+    //bilhete.setStatus(true);
+   }
+
+   // mes maior que
+
+  private int calcularDias(int mes, int ano){
+     int soma = 0;
+     while (mes > 0){
+         Meses mesEnum = Meses.values()[mes - 1];
+         soma += mesEnum.getDias(ano);
+         mes--;
+     }
+     return soma;
+  }
+
+   private long calcularValorPagamento (Bilhete bilhete, short tempoToleranciaHora, short valorMulta, short valorPadraoPagamento){
+
+       int diaEstacionamento = Integer.parseInt(bilhete.getDate().substring(8,10));
+       int mesEstacionamento = Integer.parseInt(bilhete.getDate().substring(5,7));
+       int anoEstacionamento = Integer.parseInt(bilhete.getDate().substring(0,4));
+
+
+       int diaRetirada = LocalDate.now().getDayOfMonth();
+       int mesRetirada = LocalDate.now().getMonthValue();
+       int anoRetirada = LocalDate.now().getYear();
+
+       int diaNoMesCompra = calcularDias(diaEstacionamento, anoEstacionamento);
+       int diasRestantesNoMesCompra = diaNoMesCompra - diaEstacionamento;
+
+       int diasIntermediarios = 0;
+       for(int m = mesEstacionamento + 1; m < mesRetirada; m++){
+           diasIntermediarios += calcularDias(m, anoEstacionamento);
+       }
+
+       // Pegar as horas do dia do estacionamento, depois somar com a dos dias limites que transformei em hora e
+       // Calcula os dias completos até o dia anterior à retirada (sem contar o dia atual)
+       int diasCompletos = diasRestantesNoMesCompra + diasIntermediarios + (diaRetirada - 1);
+
+        // Converte tudo para milissegundos
+       long totalDiasMilissegundos = diasCompletos * 24 * 60 * 60 * 1000;
+       long milissegundosInsercao = (24 * 60 * 60 * 1000) - (LocalTime.parse(bilhete.getTime()).toSecondOfDay() * 1000);
+       long milissegundosRetirada = (24 * 60 * 60 * 1000) - (LocalTime.now().toSecondOfDay() * 1000);
+        final long tempoToleranciaMilissegundos = tempoToleranciaHora * 3_600_000;
+
+       long diferencaTempo = (totalDiasMilissegundos + milissegundosInsercao + milissegundosRetirada) - tempoToleranciaMilissegundos;
+        if(diferencaTempo <  0){
+            return valorPadraoPagamento;
+        }
+
+        long converteSegundos = diferencaTempo / 1000;
+        long horas = converteSegundos / 3600;
+        long minutos = (converteSegundos % 3600 / 60);
+        long segundos = (converteSegundos % 60);
+
+        return (horas * valorMulta) + (minutos * (valorMulta / 60) + (segundos * (valorMulta / 3600)));
+   }
+
+    public void abrirJanelaPagamento(){
+        pagamentoView.show();
+    }
+}*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+package com.estacionamento.controller;
+
+import com.estacionamento.view.PagamentoView;
+import com.estacionamento.model.PagamentoModel;
+import com.estacionamento.model.Bilhete;
+import com.estacionamento.enums.Meses;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.io.IOException;
+
+public class PagamentoController {
+    private final BilheteController bilheteController;
+    private final PagamentoView pagamentoView;
+    private final PagamentoModel pagamentoModel;
+
+    public PagamentoController() throws IOException, ClassNotFoundException {
+        this.pagamentoView = new PagamentoView(this);
+        this.pagamentoModel = new PagamentoModel();
+        this.bilheteController = new BilheteController();
+    }
+
+    public void realizarPagamento(short identificador) {
+        Bilhete bilhete = bilheteController.buscarBilhete(identificador);
+        int valorPagamento = (int) calcularValorPagamento(bilhete, 4, 10, 5);
+        pagamentoModel.gerarComprovantePagamento(valorPagamento); // valor pagamento e metodo pagamento
+        // bilhete.setStatus(true);
+    }
+
+    private int calcularDias(int mes, int ano) {
+        int soma = 0;
+        while (mes > 0) {
+            Meses mesEnum = Meses.values()[mes - 1];
+            soma += mesEnum.getDias(ano);
+            mes--;
+        }
+        return soma;
+    }
+
+    private long calcularValorPagamento(Bilhete bilhete, int tempoToleranciaHora, int valorMulta, int valorPadraoPagamento) {
+        int diaEstacionamento = obterDiaEstacionamento(bilhete);
+        int mesEstacionamento = obterMesEstacionamento(bilhete);
+        int anoEstacionamento = obterAnoEstacionamento(bilhete);
+
+        int diaRetirada = LocalDate.now().getDayOfMonth();
+        int mesRetirada = LocalDate.now().getMonthValue();
+        int anoRetirada = LocalDate.now().getYear();
+
+        long totalDiasMilissegundos = calcularDiasCompletos(diaEstacionamento, mesEstacionamento, anoEstacionamento, diaRetirada, mesRetirada, anoRetirada);
+        // Converte tudo para milissegundos
+        long milissegundosPosInsercaoDiaria = calcularMilissegundosPosInsercaoDiaria(bilhete, diaEstacionamento, diaRetirada, mesEstacionamento, mesRetirada, anoEstacionamento, anoRetirada);
+        final long tempoToleranciaMilissegundos = (long) tempoToleranciaHora * 3_600_000;
+        long diferencaTempo = calcularDiferencaTempo(totalDiasMilissegundos, milissegundosPosInsercaoDiaria, tempoToleranciaMilissegundos);
+
+        return calcularValorFinal(diferencaTempo, valorPadraoPagamento, valorMulta);
+    }
+
+    private int obterDiaEstacionamento(Bilhete bilhete) {
+        return Integer.parseInt(bilhete.getDate().substring(8, 10));
+    }
+
+    private int obterMesEstacionamento(Bilhete bilhete) {
+        return Integer.parseInt(bilhete.getDate().substring(5, 7));
+    }
+
+    private int obterAnoEstacionamento(Bilhete bilhete) {
+        return Integer.parseInt(bilhete.getDate().substring(0, 4));
+    }
+
+    private long calcularDiasCompletos(int diaEstacionamento, int mesEstacionamento, int anoEstacionamento, int diaRetirada, int mesRetirada, int anoRetirada) {
+        int diasRestantesNoMesEstacionamento;
+        int diasRestantesNoMesRetirada = 0;
+        int diasIntermediarios = 0;
+
+       if(mesEstacionamento == mesRetirada && anoEstacionamento == anoRetirada){
+            diasRestantesNoMesEstacionamento = diaRetirada - diaEstacionamento;
+        }else{
+            for (int m = mesEstacionamento + 1; m < ; m++) {
+                diasIntermediarios += calcularDias(m, anoEstacionamento);
+            }
+            int diaNoMesEstacionamento = calcularDias(diaEstacionamento, anoEstacionamento);
+            diasRestantesNoMesEstacionamento = diaNoMesEstacionamento - diaEstacionamento;
+            diasRestantesNoMesRetirada = (diaRetirada - 1);
+        }
+
+        // Calcula os dias completos até o dia anterior à retirada (sem contar o dia atual)
+        return (long) ((diasRestantesNoMesEstacionamento + diasIntermediarios + diasRestantesNoMesRetirada) * 24 * 60 * 60 * 1000) + calcularMilissegundosRetirada();
+    }
+
+    private long calcularMilissegundosPosInsercaoDiaria(Bilhete bilhete, int diaEstacionamento, int diaRetirada, int mesEstacionamento, int mesRetirada, int anoEstacionamento, int anoRetirada) {
+            return diaEstacionamento == diaRetirada && mesEstacionamento == mesRetirada && anoEstacionamento == anoRetirada
+                    ? calcularMilissegundosRetirada() - calcularInsercaoEstacionamento(bilhete)
+                    : (24 * 60 * 60 * 1000) - calcularInsercaoEstacionamento(bilhete);
+    }
+
+    private long calcularInsercaoEstacionamento(Bilhete bilhete){
+        return LocalTime.parse(bilhete.getTime()).toSecondOfDay() * 1000;
+    }
+
+    private long calcularMilissegundosRetirada() {
+        return LocalTime.now().toSecondOfDay() * 1000;
+    }
+
+    private long calcularDiferencaTempo(long totalDiasMilissegundos, long milissegundosPosInsercao, long tempoToleranciaMilissegundos) {
+        return (totalDiasMilissegundos + milissegundosPosInsercao) - tempoToleranciaMilissegundos;
+    }
+
+    private long calcularValorFinal(long diferencaTempo, int valorPadraoPagamento, int valorMulta) {
+        if (diferencaTempo < 0) {
+            return valorPadraoPagamento;
+        }
+
+        long converteSegundos = diferencaTempo / 1000;
+        long horas = converteSegundos / 3600;
+        long minutos = (converteSegundos % 3600 / 60);
+        long segundos = (converteSegundos % 60);
+
+        return (horas * valorMulta) + (minutos * (valorMulta / 60)) + (segundos * (valorMulta / 3600));
+    }
+
+    public void abrirJanelaPagamento() {
+        pagamentoView.show();
+    }
+}
+
+
+
+*/

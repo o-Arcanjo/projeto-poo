@@ -1,0 +1,5 @@
+IDBilhete,DataEmissao,HoraEmissao,ComprovantePagamento,DataSaida,HoraSaida,TotalBilhetesDia
+099f7237-5170-4d8e-925d-3335282ec7ad,10/09/2024,23:56:22,com.estacionamento.structure.ComprovantePagamento@4d07ac20,10/09/2024,23:56:28,1
+edd69e81-c2cf-4ff2-9d3b-10553425df28,10/09/2024,23:56:49,com.estacionamento.structure.ComprovantePagamento@1bbcc2e9,10/09/2024,23:56:58
+ccee6698-b55f-4f36-a0cd-a2b2f7a67e38,10/09/2024,23:57:00,com.estacionamento.structure.ComprovantePagamento@21c538ca,10/09/2024,23:57:07
+e54a1d78-d582-489c-b4ff-d332b098df8a,10/09/2024,23:57:10,com.estacionamento.structure.ComprovantePagamento@1827f9db,10/09/2024,23:57:17
