@@ -1,0 +1,2 @@
+IDBilhete,DataEmissao,HoraEmissao,ComprovantePagamento,DataSaida,HoraSaida,QuantidadeVeiculos
+4de60498-e043-43d9-a9c2-2b14d32cbbfc,16/09/2024,13:00:58,com.estacionamento.structure.ComprovantePagamento@42f1622b,16/09/2024,13:01:09,1

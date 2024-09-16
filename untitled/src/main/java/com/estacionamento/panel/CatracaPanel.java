@@ -28,7 +28,6 @@ public class CatracaPanel {
         this.panel = new JPanel(new BorderLayout());
         adicionarComponentesAoPanel();
         exibirBotaoCatraca();
-        carregarDadosDoCSV("bilhetes.csv");
     }
 
     private void adicionarComponentesAoPanel(){
@@ -68,17 +67,6 @@ public class CatracaPanel {
         panel.add(panelSuperior, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // Adicionar ação ao botão de adicionar bilhete
-        adicionarBilheteButton.addActionListener(e -> {
-            try {
-                adicionarBilheteAoCSV("bilhetes.csv", "1", "2024-09-08", "14:00", "Pagamento123", "2024-09-08", "15:00");
-                carregarDadosDoCSV("bilhetes.csv"); // Recarregar os dados após adicionar o bilhete
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(panel,
-                        "Erro ao adicionar bilhete: " + ex.getMessage(),
-                        "Erro de Adição", JOptionPane.ERROR_MESSAGE);
-            }
-        });
     }
 
     private void exibirBotaoCatraca() {
@@ -103,87 +91,6 @@ public class CatracaPanel {
             return Integer.parseInt(textArea.getText());
         } catch (NumberFormatException e) {
             throw new NumberFormatException("Formato Inválido!");
-        }
-    }
-
-    private void carregarDadosDoCSV(String caminhoArquivo) {
-        File arquivoCSV = new File(caminhoArquivo);
-
-        if (!arquivoCSV.exists()) {
-            try {
-                arquivoCSV.createNewFile();
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoCSV))) {
-                    writer.write("IDBilhete,DataEmissao,HoraEmissao,ComprovantePagamento,DataSaida,HoraSaida,TotalBilhetesDia");
-                    writer.newLine();
-                }
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(panel, "Erro ao criar o arquivo: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-
-        Map<String, Integer> contagemBilhetesPorDia = new HashMap<>();
-        List<String[]> bilhetes = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(arquivoCSV))) {
-            String linha;
-            br.readLine(); // Pula o cabeçalho
-
-            while ((linha = br.readLine()) != null) {
-                String[] dados = linha.split(",");
-                if (dados.length < 6) {
-                    continue;
-                }
-
-                String dataSaida = dados[4];
-                contagemBilhetesPorDia.put(dataSaida, contagemBilhetesPorDia.getOrDefault(dataSaida, 0) + 1);
-                bilhetes.add(dados);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(panel, "Erro ao ler o arquivo: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoCSV))) {
-            writer.write("IDBilhete,DataEmissao,HoraEmissao,ComprovantePagamento,DataSaida,HoraSaida,TotalBilhetesDia");
-            writer.newLine();
-
-            for (String[] dados : bilhetes) {
-                String dataSaida = dados[4];
-                int totalBilhetesDia = contagemBilhetesPorDia.getOrDefault(dataSaida, 0);
-
-                writer.write(String.join(",", dados) + "," + totalBilhetesDia);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(panel, "Erro ao escrever no arquivo: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        modeloTabela.setRowCount(0);
-
-        for (String[] dados : bilhetes) {
-            String dataSaida = dados[4];
-            int totalBilhetesDia = contagemBilhetesPorDia.get(dataSaida);
-
-            Object[] linhaTabela = {
-                    dados[0],
-                    dados[1],
-                    dados[2],
-                    dados[3],
-                    dados[4],
-                    dados[5],
-                    totalBilhetesDia
-            };
-
-            modeloTabela.addRow(linhaTabela);
-        }
-    }
-
-    private void adicionarBilheteAoCSV(String caminhoArquivo, String idBilhete, String dataEmissao, String horaEmissao, String comprovantePagamento, String dataSaida, String horaSaida) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(caminhoArquivo, true))) {
-            writer.write(idBilhete + "," + dataEmissao + "," + horaEmissao + "," + comprovantePagamento + "," + dataSaida + "," + horaSaida);
-            writer.newLine();
         }
     }
 
